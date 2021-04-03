@@ -2,20 +2,43 @@ version: '3'
 services:
   api:
     build: ./api
+    container_name: docker-project-api
     command: npm run start
     restart: unless-stopped
     ports:
-    - "3000:3000"
+     - "3000:3000"
     environment:
       - PORT=3000
       - MONGO_URL=mongodb://api_db:27017/api
     depends_on:
       - api_db
 
+  auth:
+    build: ./auth
+    container_name: docker-project-auth
+    command: npm run start
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGO_URL=mongodb://auth_db:27017/auth
+    depends_on:
+      - auth_db
+
+  auth_db:
+    image: mongo:latest
+    container_name: docker-project-auth-db
+    volumes:
+      - mongodb_auth:/data/db
+
+
   api_db:
     image: mongo:latest
+    container_name: docker-project-api-db
     volumes:
-    - mongodb_api:/data/db
+      - mongodb_api:/data/db
 
 volumes:
   mongodb_api:
+  mongodb_auth:
