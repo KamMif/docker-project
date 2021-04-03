@@ -5,12 +5,16 @@ services:
     container_name: docker-project-frontend
     command: serve -s build -l 3000
     restart: unless-stopped
+    networks:
+      - docker-project-network
 
   api:
     build: ./api
     container_name: docker-project-api
     command: npm run start
     restart: unless-stopped
+    networks:
+      - docker-project-network
     ports:
      - "3001:3001"
     environment:
@@ -25,6 +29,8 @@ services:
     container_name: docker-project-auth
     command: npm run start
     restart: unless-stopped
+    networks:
+      - docker-project-network
     ports:
       - "3002:3002"
     environment:
@@ -36,12 +42,16 @@ services:
   auth_db:
     image: mongo:latest
     container_name: docker-project-auth-db
+    networks:
+      - docker-project-network
     volumes:
       - mongodb_auth:/data/db
 
   api_db:
     image: mongo:latest
     container_name: docker-project-api-db
+    networks:
+      - docker-project-network
     volumes:
       - mongodb_api:/data/db
 
@@ -54,7 +64,13 @@ services:
     - ./nginx/nginx.conf.prod:/etc/nginx/conf.d/nginx.conf
     depends_on:
       - frontend
+    networks:
+      - docker-project-network
 
 volumes:
   mongodb_api:
   mongodb_auth:
+
+networks:
+  docker-project-network:
+    driver: bridge
